@@ -11,7 +11,9 @@
 ********************************************************************************/
 
 const express = require('express')
+const fs = require('fs')
 const path = require('path')
+const multer = require('multer')
 
 const dataService = require('./data-service.js')
 
@@ -19,7 +21,17 @@ const app = express()
 
 const PORT = process.env.PORT || 8080
 
+const storage = multer.diskStorage({
+	destination: "./public/images/uploaded",
+	filename: function(req, file, cb) {
+		cb(null, Date.now() + path.extname(file.originalname))
+	}
+})
+
+const upload = multer({ storage: storage })
+
 app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (_, res) => {
 	res.sendFile(__dirname + '/views/home.html')
@@ -51,6 +63,34 @@ app.get('/programs', (_, res) => {
 	}).catch((err) => {
 		res.json({ message: err })
 	})
+})
+
+app.get('/students/add', (_, res) => {
+	res.sendFile(__dirname + '/views/addStudent.html')
+})
+
+app.post('/students/add', (_, res) => {
+	dataService.addStudent(req.body).then(() => {
+		res.redirect('/students')
+	}).catch((err) => {
+		res.json({ message: err })
+	})
+})
+
+app.get('/images/add', (_, res) => {
+	res.sendFile(__dirname + '/views/addImage.html')
+})
+
+app.post('/images/add', upload.single("imageFile"), (_, res) => {
+	res.redirect('/images')
+})
+
+app.get('/images', (_, res) => {
+	const images = []
+	fs.readdir('./public/images/uploaded', function(err, items) {
+		images.push(items)
+		res.json({ images })
+	});
 })
 
 app.get('*', (_, res) => {
