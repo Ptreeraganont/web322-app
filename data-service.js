@@ -56,10 +56,42 @@ const addStudent = (studentData) =>
 		resolve(students)
 	})
 
+const getStudentsByStatus = (status) =>
+	new Promise((resolve, reject) => {
+		const studentsByStatus = students.filter(o => o.status === status)
+		if (studentsByStatus.length === 0) reject('no results returned')
+		resolve(studentsByStatus)
+	})
+
+const getStudentsByProgramCode = (programCode) =>
+	new Promise((resolve, reject) => {
+		const studentsByProgramCode = students.filter(o => o.program === programCode)
+		if (studentsByProgramCode.length === 0) reject('no results returned')
+		resolve(studentsByProgramCode)
+	})
+
+const getStudentsByExpectedCredential = (credential) =>
+	new Promise((resolve, reject) => {
+		const studentsByExpectedCredential = students.filter(o => o.expectedCredential === credential)
+		if (studentsByExpectedCredential.length === 0) reject('no results returned')
+		resolve(studentsByExpectedCredential)
+	})
+
+const getStudentById = (sid) =>
+	new Promise((resolve, reject) => {
+		const student = students.find(o => o.studentID === sid)
+		if (!student) reject('no results returned')
+		resolve(student)
+	})
+
 module.exports = {
 	initialize,
 	getAllStudents,
 	getInternationalStudents,
 	getPrograms,
 	addStudent,
+	getStudentsByStatus,
+	getStudentsByProgramCode,
+	getStudentsByExpectedCredential,
+	getStudentById,
 }

@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 8080
 
 const storage = multer.diskStorage({
 	destination: "./public/images/uploaded",
-	filename: function(req, file, cb) {
+	filename: function (req, file, cb) {
 		cb(null, Date.now() + path.extname(file.originalname))
 	}
 })
@@ -41,8 +41,38 @@ app.get('/about', (_, res) => {
 	res.sendFile(__dirname + '/views/about.html')
 })
 
-app.get('/students', (_, res) => {
-	dataService.getAllStudents().then((data) => {
+app.get('/students', (req, res) => {
+	const { status, program, credential } = req.query
+	if (status !== undefined) {
+		dataService.getStudentsByStatus(status).then((data) => {
+			res.json(data)
+		}).catch((err) => {
+			res.json({ message: err })
+		})
+	} else if (program !== undefined) {
+		dataService.getStudentsByProgramCode(program).then((data) => {
+			res.json(data)
+		}).catch((err) => {
+			res.json({ message: err })
+		})
+	} else if (credential !== undefined) {
+		dataService.getStudentsByExpectedCredential(credential).then((data) => {
+			res.json(data)
+		}).catch((err) => {
+			res.json({ message: err })
+		})
+	} else {
+		dataService.getAllStudents().then((data) => {
+			res.json(data)
+		}).catch((err) => {
+			res.json({ message: err })
+		})
+	}
+})
+
+app.get('/student/:value', (req, res) => {
+	const { value } = req.params
+	dataService.getStudentById(value).then((data) => {
 		res.json(data)
 	}).catch((err) => {
 		res.json({ message: err })
@@ -87,7 +117,7 @@ app.post('/images/add', upload.single("imageFile"), (_, res) => {
 
 app.get('/images', (_, res) => {
 	const images = []
-	fs.readdir('./public/images/uploaded', function(err, items) {
+	fs.readdir('./public/images/uploaded', function (err, items) {
 		images.push(items)
 		res.json({ images })
 	});
@@ -102,6 +132,6 @@ dataService.initialize().then(() => {
 		console.log(`Express http server listening on ${PORT}`)
 	})
 })
-	.catch((err) => {
-		console.log(err)
-	})
+.catch((err) => {
+	console.log(err)
+})
