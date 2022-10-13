@@ -41,9 +41,25 @@ const getPrograms = () =>
 		resolve(programs)
 	})
 
+const addStudent = (studentData) =>
+	new Promise((resolve, reject) => {
+		if (studentData.isInternationalStudent === undefined) {
+			studentData.isInternationalStudent = false
+		} else {
+			studentData.isInternationalStudent = true
+		}
+
+		const maxStudentId = Math.max(...students.map(o => o.studentID))
+		const newStudentId = (maxStudentId + 1).toString()
+		studentData.studentID = newStudentId
+		students.push(studentData)
+		resolve(students)
+	})
+
 module.exports = {
 	initialize,
 	getAllStudents,
 	getInternationalStudents,
 	getPrograms,
+	addStudent,
 }

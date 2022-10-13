@@ -69,7 +69,7 @@ app.get('/students/add', (_, res) => {
 	res.sendFile(__dirname + '/views/addStudent.html')
 })
 
-app.post('/students/add', (_, res) => {
+app.post('/students/add', (req, res) => {
 	dataService.addStudent(req.body).then(() => {
 		res.redirect('/students')
 	}).catch((err) => {
